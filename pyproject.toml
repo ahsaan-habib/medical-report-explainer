@@ -1,0 +1,17 @@
+[project]
+name = "medical-report-explainer"
+version = "0.1.0"
+description = "Explains lab reports in plain language, grounded in reference ranges, released only after a clinician signs off"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "pypdf>=4.2",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["medrep*"]
