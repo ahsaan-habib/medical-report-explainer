@@ -1,0 +1,14 @@
+test,aliases,unit,sex,age_min,age_max,low,high,source
+Haemoglobin,hemoglobin|hb|hgb,g/dL,female,18,120,12.0,15.5,SAMPLE adult range - replace with your laboratory's validated intervals
+Haemoglobin,hemoglobin|hb|hgb,g/dL,male,18,120,13.5,17.5,SAMPLE adult range - replace with your laboratory's validated intervals
+White blood cells,wbc|leukocytes|white cell count,10^9/L,,18,120,4.5,11.0,SAMPLE adult range - replace with your laboratory's validated intervals
+Platelets,plt|platelet count,10^9/L,,18,120,150,450,SAMPLE adult range - replace with your laboratory's validated intervals
+Glucose (fasting),glucose|fasting glucose|fbg,mmol/L,,18,120,3.9,5.5,SAMPLE adult range - replace with your laboratory's validated intervals
+Glucose (fasting),glucose|fasting glucose|fbg,mg/dL,,18,120,70,99,SAMPLE adult range - replace with your laboratory's validated intervals
+Sodium,na,mmol/L,,18,120,135,145,SAMPLE adult range - replace with your laboratory's validated intervals
+Potassium,k,mmol/L,,18,120,3.5,5.0,SAMPLE adult range - replace with your laboratory's validated intervals
+Creatinine,creat,mg/dL,female,18,120,0.59,1.04,SAMPLE adult range - replace with your laboratory's validated intervals
+Creatinine,creat,mg/dL,male,18,120,0.74,1.35,SAMPLE adult range - replace with your laboratory's validated intervals
+TSH,thyroid stimulating hormone,mIU/L,,18,120,0.4,4.0,SAMPLE adult range - replace with your laboratory's validated intervals
+HbA1c,a1c|glycated haemoglobin|glycated hemoglobin,%,,18,120,,5.7,SAMPLE adult range - replace with your laboratory's validated intervals
+LDL cholesterol,ldl|ldl-c,mg/dL,,18,120,,100,SAMPLE adult range - replace with your laboratory's validated intervals
