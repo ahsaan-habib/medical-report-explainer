@@ -14,10 +14,11 @@ def process(report: Report) -> Report:
     report = report.model_copy(update={"results": results, "status": Status.EXTRACTED})
 
     text = explain.draft(results, report.patient)
-    issues = guard.problems(text) + guard.numbers_grounded(text, results)
+    extra = (report.patient.age,) if report.patient.age is not None else ()
+    issues = guard.problems(text) + guard.numbers_grounded(text, results, extra)
     if issues:
         text = explain.draft(results, report.patient, feedback="; ".join(issues))
-        issues = guard.problems(text) + guard.numbers_grounded(text, results)
+        issues = guard.problems(text) + guard.numbers_grounded(text, results, extra)
     if issues:
         # don't hand the clinician a draft that breaks the rules; hand them the facts
         text = ("[Automatic draft withheld: " + "; ".join(issues) + "]\n\n"

@@ -28,8 +28,9 @@ def problems(text: str) -> list[str]:
     return found
 
 
-def numbers_grounded(text: str, results: list[Result]) -> list[str]:
+def numbers_grounded(text: str, results: list[Result], extra: tuple[float, ...] = ()) -> list[str]:
     """Every number in the draft must come from the input values or ranges."""
     allowed = {f"{x:g}" for r in results for x in (r.value, r.ref_low, r.ref_high) if x is not None}
+    allowed |= {f"{x:g}" for x in extra}
     stray = [n for n in re.findall(r"\d+(?:\.\d+)?", text) if n not in allowed and f"{float(n):g}" not in allowed]
     return [f"number not in the results ({n})" for n in sorted(set(stray))]
