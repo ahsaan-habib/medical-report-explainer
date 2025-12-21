@@ -57,18 +57,32 @@ def transition(report: Report, new: Status, **changes) -> Report:
 
 
 def approve(report_id: str, clinician: str, final_text: str) -> Report:
+    from . import audit
+
     if not clinician.strip():
         raise GateError("approval needs a named clinician")
     if not final_text.strip():
         raise GateError("approval needs the text the patient will see")
-    return transition(get(report_id), Status.APPROVED, reviewer=clinician, final=final_text)
+    report = get(report_id)
+    out = transition(report, Status.APPROVED, reviewer=clinician, final=final_text)
+    audit.log(report_id, clinician, "approved", edits=audit.edits(report.draft, final_text))
+    return out
 
 
-def reject(report_id: str, clinician: str) -> Report:
-    return transition(get(report_id), Status.REJECTED, reviewer=clinician)
+def reject(report_id: str, clinician: str, reason: str = "") -> Report:
+    from . import audit
+
+    out = transition(get(report_id), Status.REJECTED, reviewer=clinician)
+    audit.log(report_id, clinician, "rejected", reason=reason)
+    return out
 
 
 def patient_view(report_id: str) -> str | None:
     """None unless a clinician approved it. There is no other path to the patient."""
+    from . import audit
+
     r = get(report_id)
-    return r.final if r and r.status == Status.APPROVED else None
+    if r and r.status == Status.APPROVED:
+        audit.log(report_id, "patient", "viewed")
+        return r.final
+    return None
