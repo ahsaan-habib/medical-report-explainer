@@ -1,0 +1,46 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report review</title>
+<style>
+  body { font: 15px system-ui, sans-serif; max-width: 980px; margin: 24px auto; padding: 0 16px; color: #1d2433; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .row { grid-template-columns: 1fr; } }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  td, th { border-bottom: 1px solid #e3e7ee; padding: 4px 6px; text-align: left; }
+  .high, .low { color: #b4232a; font-weight: 600; }
+  textarea { width: 100%; min-height: 340px; font: inherit; }
+  input { font: inherit; padding: 6px; }
+</style>
+<h2>Clinician review</h2>
+<p><input id="tok" placeholder="token"> <input id="me" placeholder="your name"> <button id="load">Load queue</button></p>
+<ul id="queue"></ul>
+<div id="detail" hidden>
+  <div class="row">
+    <div><h3>Extracted values</h3><table id="vals"></table><h3>Original report</h3><pre id="raw" style="white-space:pre-wrap;font-size:12px"></pre></div>
+    <div><h3>Patient explanation (edit before approving)</h3><textarea id="text"></textarea>
+      <p><button id="ok">Approve and release</button> <button id="no">Reject — I'll contact the patient</button></p></div>
+  </div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+const h = () => ({ authorization: "Bearer " + $("tok").value, "x-clinician": $("me").value, "content-type": "application/json" });
+let current = null;
+$("load").onclick = async () => {
+  const q = await (await fetch("/review", { headers: h() })).json();
+  $("queue").innerHTML = "";
+  for (const r of q) {
+    const li = document.createElement("li"); const a = document.createElement("a");
+    a.href = "#"; a.textContent = `${r.id} · ${r.results.length} results · ${r.results.filter(x => x.flag === "high" || x.flag === "low").length} outside range`;
+    a.onclick = (e) => { e.preventDefault(); open(r.id); }; li.appendChild(a); $("queue").appendChild(li);
+  }
+};
+async function open(id) {
+  const r = await (await fetch("/review/" + id, { headers: h() })).json();
+  current = id; $("detail").hidden = false; $("text").value = r.draft; $("raw").textContent = r.raw_text;
+  $("vals").innerHTML = "<tr><th>Test</th><th>Value</th><th>Range</th><th>Source</th></tr>" + r.results.map(x =>
+    `<tr class="${x.flag}"><td>${x.test}</td><td>${x.value} ${x.unit}</td><td>${x.ref_low ?? ""}–${x.ref_high ?? ""}</td><td>${x.ref_source || "none"}</td></tr>`).join("");
+}
+$("ok").onclick = async () => { await fetch(`/review/${current}/approve`, { method: "POST", headers: h(), body: JSON.stringify({ final_text: $("text").value }) }); $("detail").hidden = true; $("load").click(); };
+$("no").onclick = async () => { await fetch(`/review/${current}/reject`, { method: "POST", headers: h(), body: JSON.stringify({ reason: "clinician will contact" }) }); $("detail").hidden = true; $("load").click(); };
+</script>

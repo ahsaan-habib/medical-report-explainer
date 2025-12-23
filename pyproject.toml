@@ -7,6 +7,9 @@ dependencies = [
     "httpx>=0.27",
     "pydantic>=2.7",
     "pypdf>=4.2",
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.30",
+    "python-multipart>=0.0.9",
 ]
 
 [build-system]
@@ -15,3 +18,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["medrep*"]
+
+[tool.setuptools.package-data]
+medrep = ["static/*"]
