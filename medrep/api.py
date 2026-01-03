@@ -51,9 +51,9 @@ def queue(who: str = Depends(clinician)) -> list[dict]:
 
 @app.get("/review/{report_id}")
 def detail(report_id: str, who: str = Depends(clinician)) -> dict:
-    r = store.get(report_id) or HTTPException(404)
-    if isinstance(r, HTTPException):
-        raise r
+    r = store.get(report_id)
+    if r is None:
+        raise HTTPException(404)
     return {**r.model_dump(), "history": audit.history(report_id)}
 
 
@@ -64,6 +64,8 @@ class Decision(BaseModel):
 
 @app.post("/review/{report_id}/approve")
 def approve(report_id: str, body: Decision, who: str = Depends(clinician)) -> dict:
+    if store.get(report_id) is None:
+        raise HTTPException(404)
     try:
         return {"status": store.approve(report_id, who, body.final_text).status}
     except store.GateError as e:
@@ -72,6 +74,8 @@ def approve(report_id: str, body: Decision, who: str = Depends(clinician)) -> di
 
 @app.post("/review/{report_id}/reject")
 def reject(report_id: str, body: Decision, who: str = Depends(clinician)) -> dict:
+    if store.get(report_id) is None:
+        raise HTTPException(404)
     try:
         return {"status": store.reject(report_id, who, body.reason).status}
     except store.GateError as e:
