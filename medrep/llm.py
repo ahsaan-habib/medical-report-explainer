@@ -5,7 +5,7 @@ import os
 import httpx
 
 OLLAMA_URL = os.environ.get("MEDREP_OLLAMA_URL", "http://localhost:11434")
-MODEL = os.environ.get("MEDREP_MODEL", "qwen3:4b")
+MODEL = os.environ.get("MEDREP_MODEL", "qwen3:4b-instruct")
 
 
 def chat(messages: list[dict], fmt: str | dict | None = None) -> str:

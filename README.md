@@ -44,7 +44,7 @@ withheld and the clinician gets the raw values instead.
 ## Run it
 
 ```bash
-ollama pull qwen3:4b
+ollama pull qwen3:4b-instruct   # not plain qwen3:4b: that tag is now a thinking-only build
 python -m venv .venv && .venv/bin/pip install -e . && source .venv/bin/activate
 uvicorn medrep.api:app --port 8030      # review console at /
 curl -F file=@report.pdf -F sex=female -F age=45 \
