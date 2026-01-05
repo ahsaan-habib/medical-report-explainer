@@ -13,9 +13,12 @@ from .models import Result
 
 NUM = r"[-+]?\d+(?:[.,]\d+)?"
 # Haemoglobin   13.2   g/dL   12.0 - 15.5      (also "12.0–15.5", "< 5.0", "> 60")
+# units may start with a power of ten: "10^9/L"
 ROW = re.compile(
     rf"^\s*(?P<test>[A-Za-z][A-Za-z0-9 ()/,.\-]*?)\s{{2,}}(?P<value>{NUM})\s*(?P<flag>[HL]\b)?\s+"
-    rf"(?P<unit>[^\s\d][^\s]*)\s+(?P<range>(?:{NUM}\s*[-–]\s*{NUM})|(?:[<>]=?\s*{NUM}))\s*$")
+    rf"(?P<unit>\d+\^\S+|[^\s\d]\S*)\s+(?P<range>(?:{NUM}\s*[-–]\s*{NUM})|(?:[<>]=?\s*{NUM}))\s*$")
+# "low - high" where either bound may be negative: "-2 - 2", "-5–-1"
+RANGE = re.compile(rf"({NUM})[-–]({NUM})")
 
 
 def to_float(s: str) -> float:
@@ -45,7 +48,7 @@ def parse_rows(text: str) -> tuple[list[Result], list[str]]:
             bound = to_float(rng.lstrip("<>="))
             low, high = (None, bound) if rng[0] == "<" else (bound, None)
         else:
-            a, b = re.split(r"[-–]", rng, maxsplit=1)
+            a, b = RANGE.fullmatch(rng).groups()
             low, high = to_float(a), to_float(b)
         results.append(Result(test=m["test"].strip(), value=to_float(m["value"]), unit=m["unit"],
                               ref_low=low, ref_high=high, ref_source="report"))
